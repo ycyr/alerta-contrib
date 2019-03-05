@@ -25,21 +25,21 @@ class TriggerTicket(PluginBase):
 
     def pre_receive(self, alert):
 
+    	if alert.customer in EASYVISTA_CUSTORMERS:
+        	if not alert.is_duplicate():
+        		   if not alert.attributes['easyvista_num']:
+        	   		        data={'requests': [{'Catalog_Code': EASYVISTA_CATALOGID, 'Recipient.Last_name': 'Test', 'description': 'Test with Alerta'}]}
+                    	    try: 
+                        		r = requests.post(EASYVISTA_URL, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD), json=data) 
+                        		ticket_response = r.json
+                        		ticket_num_list = re.findall("(INC\d+)", ticket_response["HREF"])
+                        		alert.attributes = {
+                            		   'easyvista_num' : ticket_num_list[0]
+                        		}
 
-        if not alert.is_duplicate():
-        	   if not alert.attributes['easyvista_num']:
-        	   	        data={'requests': [{'Catalog_Code': EASYVISTA_CATALOGID, 'Recipient.Last_name': 'Test', 'description': 'Test with Alerta'}]}
-                        try: 
-                        	r = requests.post(EASYVISTA_URL, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD), json=data) 
-                        	ticket_response = r.json
-                        	ticket_num_list = re.findall("(INC\d+)", ticket_response["HREF"])
-                        	alert.attributes = {
-                            	   'easyvista_num' : ticket_num_list[0]
-                        	}
-
-      					except Exception as e:
-      						LOG.error("Ticket Creation failed: %s" % str(e))
-            				raise RuntimeError("Ticket Creation lookup failed: %s" % str(e))
+      						except Exception as e:
+      							LOG.error("Ticket Creation failed: %s" % str(e))
+            					raise RuntimeError("Ticket Creation lookup failed: %s" % str(e))
 
         return alert
 

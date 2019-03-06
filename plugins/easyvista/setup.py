@@ -7,7 +7,7 @@ setup(
     name="alerta-easyvista",
     version=version,
     description='Alerta plugin for EasyVista Lookup',
-    url='https://github.com/easyvista/alerta-contrib',
+    url='https://github.com/ycyr/alerta-contrib',
     license='MIT',
     author='Yanick Cyr',
     author_email='yanick.cyr@gmail.com',

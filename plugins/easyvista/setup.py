@@ -15,7 +15,6 @@ setup(
     py_modules=['alerta_easyvista'],
     install_requires=[
         'requests',
-        'json',
         're'
     ],
     include_package_data=True,

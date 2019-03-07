@@ -1,7 +1,7 @@
 
 from setuptools import setup, find_packages
 
-version = '0.0.1'
+version = '0.0.2'
 
 setup(
     name="alerta-easyvista",
@@ -14,7 +14,8 @@ setup(
     packages=find_packages(),
     py_modules=['alerta_easyvista'],
     install_requires=[
-        'requests'
+        'requests',
+        'json'
     ],
     include_package_data=True,
     zip_safe=True,

@@ -14,8 +14,7 @@ setup(
     packages=find_packages(),
     py_modules=['alerta_easyvista'],
     install_requires=[
-        'requests',
-        're'
+        'requests'
     ],
     include_package_data=True,
     zip_safe=True,

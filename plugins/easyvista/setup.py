@@ -1,7 +1,7 @@
 
 from setuptools import setup, find_packages
 
-version = '0.0.3'
+version = '0.9'
 
 setup(
     name="alerta-easyvista",
@@ -20,7 +20,7 @@ setup(
     zip_safe=True,
     entry_points={
         'alerta.plugins': [
-            'easyvista = alerta_easyvista:TriggerTicket'
+            'easyvista = alerta_easyvista:EasyVistaAlert'
         ]
     }
 )

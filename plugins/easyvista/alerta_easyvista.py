@@ -16,7 +16,7 @@ EASYVISTA_PASSWORD = os.environ.get('EASYVISTA_PASSWORD') or app.config['EASYVIS
 EASYVISTA_CATALOGID = os.environ.get('EASYVISTA_CATALOGID') or app.config['EASYVISTA_CATALOGID']
 EASYVISTA_CUSTOMERS = os.environ.get('EASYVISTA_CUSTOMERS') or app.config['EASYVISTA_CUSTOMERS']
 
-data = {"requests":[{"Catalog_Code": EASYVISTA_CATALOGID ,"Recipient.Last_name":"Test","description":"Alerte généré depuis Alerta"}]}
+data = {"requests":[{"Catalog_Code": EASYVISTA_CATALOGID ,"Recipient.Last_name":"Test","description":"Alerte générée depuis Alerta"}]}
 
 
 class EasyVistaAlert(PluginBase):

@@ -17,7 +17,6 @@ EASYVISTA_PASSWORD = os.environ.get('EASYVISTA_PASSWORD') or app.config['EASYVIS
 EASYVISTA_CATALOGID = os.environ.get('EASYVISTA_CATALOGID') or app.config['EASYVISTA_CATALOGID']
 EASYVISTA_CUSTOMERS = os.environ.get('EASYVISTA_CUSTOMERS') or app.config['EASYVISTA_CUSTOMERS']
 
-data = {"requests":[{"Catalog_Code": EASYVISTA_CATALOGID ,"Recipient.Last_name":"Test","description":"Alerte générée depuis Alerta"}]}
 
 
 class EasyVistaAlert(PluginBase):
@@ -25,7 +24,17 @@ class EasyVistaAlert(PluginBase):
     correlated = False
 
     def create_ticket(self, alert):
-
+        data = {
+                 "requests":[{
+                               "Catalog_Code": EASYVISTA_CATALOGID ,
+                               "description": "\
+                                           ***Alerte générée depuis Alerta*** \n\n \
+                                           Alerte: {} \n \
+                                           Instance: {}\n \
+                                           Informations supplémentaires: {} \n \
+                                           ".format(alert.event, alert.resource if hasattr(alert, 'resource') else "N/A", alert.text if hasattr(alert, 'text') else "N/A")
+                             }]
+               }
         r = requests.post(EASYVISTA_URL, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD), json=data)
         LOG.info("Réponse HTTP: {} et Explication: {} ".format(r.status_code, r.reason))
         alert.attributes['ITSM'] = re.findall("(INC\d+)", r.json()["HREF"])[0]
@@ -43,13 +52,14 @@ class EasyVistaAlert(PluginBase):
 
         return ticket_status
 
+   
 
     def pre_receive(self, alert):
          
         
         if db.is_correlated(alert) is True:
             self.correlated = True
-            LOG.info("Alerte Corrollée PRE: {}".format(self.correlated))
+            LOG.info("Alerte Corrollée: {}".format(self.correlated))
  
         return alert
 
@@ -59,16 +69,13 @@ class EasyVistaAlert(PluginBase):
 
         LOG.info("Enhancing alert ITSM ")
         
-        
-        LOG.info("Function POST: {}".format(self.correlated))
         if  alert.customer != None and alert.customer in EASYVISTA_CUSTOMERS:
 
             LOG.info("BON CUSTOMER")
             LOG.info("Nombre de duplicas: {}".format(alert.duplicate_count))
 
-            if  alert.duplicate_count > 0 or self.correlated is True:
+            if  (alert.duplicate_count > 0 or self.correlated is True) and 'ITSM' in alert.attributes:
 
-                LOG.info("Alerte Corrollée POST: {}".format(self.correlated))
                 LOG.info("Alerte dupliquée: No Ticket actuel: {}".format(alert.attributes['ITSM']))
                 LOG.info("Status du ticket {}: {}".format(alert.attributes['ITSM'], self.retreive_ticket_status(alert)))
 

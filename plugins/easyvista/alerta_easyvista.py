@@ -6,6 +6,7 @@ import os
 
 from alerta.plugins import app
 from alerta.plugins import PluginBase
+from alerta.app import db
 
 LOG = logging.getLogger('alerta.plugins.easyvista')
 
@@ -20,6 +21,8 @@ data = {"requests":[{"Catalog_Code": EASYVISTA_CATALOGID ,"Recipient.Last_name":
 
 
 class EasyVistaAlert(PluginBase):
+
+    correlated = False
 
     def create_ticket(self, alert):
 
@@ -42,7 +45,12 @@ class EasyVistaAlert(PluginBase):
 
 
     def pre_receive(self, alert):
-
+         
+        
+        if db.is_correlated(alert) is True:
+            self.correlated = True
+            LOG.info("Alerte Corrollée PRE: {}".format(self.correlated))
+ 
         return alert
 
 
@@ -52,13 +60,15 @@ class EasyVistaAlert(PluginBase):
         LOG.info("Enhancing alert ITSM ")
         
         
+        LOG.info("Function POST: {}".format(self.correlated))
         if  alert.customer != None and alert.customer in EASYVISTA_CUSTOMERS:
 
             LOG.info("BON CUSTOMER")
             LOG.info("Nombre de duplicas: {}".format(alert.duplicate_count))
 
-            if  alert.duplicate_count > 0:
+            if  alert.duplicate_count > 0 or self.correlated is True:
 
+                LOG.info("Alerte Corrollée POST: {}".format(self.correlated))
                 LOG.info("Alerte dupliquée: No Ticket actuel: {}".format(alert.attributes['ITSM']))
                 LOG.info("Status du ticket {}: {}".format(alert.attributes['ITSM'], self.retreive_ticket_status(alert)))
 

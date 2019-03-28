@@ -18,24 +18,29 @@ EASYVISTA_CATALOGID = os.environ.get('EASYVISTA_CATALOGID') or app.config['EASYV
 EASYVISTA_CUSTOMERS = os.environ.get('EASYVISTA_CUSTOMERS') or app.config['EASYVISTA_CUSTOMERS']
 
 
+DEFAULT_DATAL_PAYLOAD = {
+        "requests":[{
+                    "Catalog_Code": EASYVISTA_CATALOGID ,
+                    "description": "\
+                    ***Alerte générée depuis Alerta*** \n\n \
+                    Alerte: {} \n \
+                    Instance: {}\n \
+                    Informations supplémentaires: {} \n \
+                    ".format(alert.event, alert.resource if hasattr(alert, 'resource') else "N/A", alert.text if hasattr(alert, 'text') else "N/A")
+                    }]
+        }
+
+
+EASYVISTA_DATA_PAYLOAD = app.config['EASVISTA_DATA_PAYLOAD', DEFAULT_DATA_PAYLOAD]
+
+
 
 class EasyVistaAlert(PluginBase):
 
     correlated = False
 
     def create_ticket(self, alert):
-        data = {
-                 "requests":[{
-                               "Catalog_Code": EASYVISTA_CATALOGID ,
-                               "description": "\
-                                           ***Alerte générée depuis Alerta*** \n\n \
-                                           Alerte: {} \n \
-                                           Instance: {}\n \
-                                           Informations supplémentaires: {} \n \
-                                           ".format(alert.event, alert.resource if hasattr(alert, 'resource') else "N/A", alert.text if hasattr(alert, 'text') else "N/A")
-                             }]
-               }
-        r = requests.post(EASYVISTA_URL, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD), json=data)
+        r = requests.post(EASYVISTA_URL, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD), json=EASYVISTA_DATA_PAYLOAD)
         LOG.info("HTTP Status Code: {} and Reason: {} ".format(r.status_code, r.reason))
         alert.attributes['ITSM'] = re.findall("(INC\d+)", r.json()["HREF"])[0]
         LOG.info("Ticket {} has been created in EasyVista".format(re.findall("(INC\d+)", r.json()["HREF"])[0]))

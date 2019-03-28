@@ -36,9 +36,9 @@ class EasyVistaAlert(PluginBase):
                              }]
                }
         r = requests.post(EASYVISTA_URL, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD), json=data)
-        LOG.info("Réponse HTTP: {} et Explication: {} ".format(r.status_code, r.reason))
+        LOG.info("HTTP Status Code: {} and Reason: {} ".format(r.status_code, r.reason))
         alert.attributes['ITSM'] = re.findall("(INC\d+)", r.json()["HREF"])[0]
-        LOG.info("Le ticket {} a été crée dans EasyVista".format(re.findall("(INC\d+)", r.json()["HREF"])[0]))
+        LOG.info("Ticket {} has been created in EasyVista".format(re.findall("(INC\d+)", r.json()["HREF"])[0]))
 
         return
 
@@ -47,7 +47,7 @@ class EasyVistaAlert(PluginBase):
 
         url = EASYVISTA_URL + '/' + str(alert.attributes['ITSM'])
         r = requests.get(url, auth=(EASYVISTA_USERNAME, EASYVISTA_PASSWORD)  )
-        LOG.info("Réponse HTTP: {} et Explication: {} ".format(r.status_code, r.reason))
+        LOG.info("HTTP Status Code: {} and Reason: {} ".format(r.status_code, r.reason))
         ticket_status = r.json()["STATUS"]["STATUS_FR"]
 
         return ticket_status
@@ -59,7 +59,7 @@ class EasyVistaAlert(PluginBase):
         
         if db.is_correlated(alert) is True:
             self.correlated = True
-            LOG.info("Alerte Corrollée: {}".format(self.correlated))
+            LOG.info("Correlated Alert: {}".format(self.correlated))
  
         return alert
 
@@ -71,27 +71,27 @@ class EasyVistaAlert(PluginBase):
         
         if  alert.customer != None and alert.customer in EASYVISTA_CUSTOMERS:
 
-            LOG.info("BON CUSTOMER")
-            LOG.info("Nombre de duplicas: {}".format(alert.duplicate_count))
+            LOG.info("{} in EASYVISTA_CUSTOMERS".format(alert.customer))
+            LOG.info("Number of duplicate: {}".format(alert.duplicate_count))
 
             if  (alert.duplicate_count > 0 or self.correlated is True) and 'ITSM' in alert.attributes:
 
-                LOG.info("Alerte dupliquée: No Ticket actuel: {}".format(alert.attributes['ITSM']))
-                LOG.info("Status du ticket {}: {}".format(alert.attributes['ITSM'], self.retreive_ticket_status(alert)))
+                LOG.info("Duplicated alert: Actual Ticket number: {}".format(alert.attributes['ITSM']))
+                LOG.info("Ticket Status {}: {}".format(alert.attributes['ITSM'], self.retreive_ticket_status(alert)))
 
                 if self.retreive_ticket_status(alert) =="Clôturé":
 
-                    LOG.info("Ouverture d'un nouveau ticket EASYVISTA car le ticket {} a été clôturé".format(alert.attributes['ITSM']))
+                    LOG.info("Creating a new ticket in Easyvista because {} has been closed".format(alert.attributes['ITSM']))
 
                     self.create_ticket(alert)
             else:
 
-                LOG.info("Ouverture d'un nouveau ticket EASYVISTA")
+                LOG.info("Creating a new ticket in Easyvista")
 
                 self.create_ticket(alert)
 
         else:
-            LOG.info("PAS BON CUSTOMER")
+            LOG.info("Customer view not in EASYVISTA_CUSTOMERS")
 
 
         return alert

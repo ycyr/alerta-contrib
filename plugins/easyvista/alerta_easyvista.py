@@ -72,7 +72,7 @@ class EasyVistaAlert(PluginBase):
         if  alert.customer != None and alert.customer in EASYVISTA_CUSTOMERS:
 
             LOG.info("{} in EASYVISTA_CUSTOMERS".format(alert.customer))
-            LOG.info("Number of duplicate: {}".format(alert.duplicate_count))
+            LOG.info("Number of duplicates: {}".format(alert.duplicate_count))
 
             if  (alert.duplicate_count > 0 or self.correlated is True) and 'ITSM' in alert.attributes:
 

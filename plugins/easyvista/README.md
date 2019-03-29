@@ -33,19 +33,6 @@ TBC
 ```
 
 
-Troubleshooting
----------------
-
-Restart Alerta API and confirm that the plugin has been loaded and enabled.
-
-Set `DEBUG=True` in the `alertad.conf` configuration file and look for log
-entries similar to below:
-
-```
-2016-11-20 21:54:48,627 - alerta.plugins.geoip[5416]: DEBUG - GeoIP lookup for IP: 86.128.7.160 [in build/bdist.macosx-10.12-x86_64/egg/alerta_geoip.py:19]
-```
-
-
 License
 -------
 
